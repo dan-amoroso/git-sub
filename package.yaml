@@ -23,6 +23,11 @@ dependencies:
 - base >= 4.7 && < 5
 - parsec
 - text-format-simple
+- text
+- turtle
+- optparse-applicative
+- system-filepath
+- bytestring
 
 library:
   source-dirs: src

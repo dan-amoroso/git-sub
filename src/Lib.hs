@@ -1,7 +1,7 @@
 module Lib
-    ( someFunc
-    , Submodule
+    ( Submodule
     , parseSubmodule
+    , parseSubmodules
     ) where
 
 import           Control.Applicative hiding (many)
@@ -14,7 +14,10 @@ type Name = String
 type Path = String
 type Url = String
 
-data Submodule = Submodule Name Path Url deriving (Show, Eq)
+data Submodule = Submodule Name Path Url deriving (Eq)
+
+instance Show Submodule where
+  show (Submodule _ path _) = path
 
 parseSubmodule :: Parsec String () Submodule
 parseSubmodule = do
@@ -30,6 +33,8 @@ parseSubmodule = do
     pathOpen = string "path = "
     urlOpen = string "url = "
     text = many $ noneOf " \n\t"
+
+parseSubmodules = parse (many parseSubmodule) ".gitmodules"
 
 writeSubmodule :: Submodule -> String
 writeSubmodule (Submodule name path url) =
