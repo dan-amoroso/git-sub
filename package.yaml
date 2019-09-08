@@ -1,10 +1,10 @@
 name:                git-submodule
 version:             0.1.0.0
-github:              "githubuser/git-submodule"
+github:              "Dansvidania/git-submodule"
 license:             BSD3
-author:              "Author name here"
-maintainer:          "example@example.com"
-copyright:           "2019 Author name here"
+author:              "Danilo Amoroso"
+maintainer:          "dan.j.amoroso@gmail.com"
+copyright:           "2019 Danilo Amoroso"
 
 extra-source-files:
 - README.md
@@ -21,6 +21,8 @@ description:         Please see the README on GitHub at <https://github.com/gith
 
 dependencies:
 - base >= 4.7 && < 5
+- parsec
+- text-format-simple
 
 library:
   source-dirs: src
