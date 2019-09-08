@@ -18,7 +18,7 @@ import           Options.Applicative
 import           Prelude                   hiding (FilePath, putStrLn)
 
 smDescription = "utility to manage submodules in a git repository"
-smHeader = "sub-man: git submodules made easy"
+smHeader = "git-sub: git submodules made easy"
 
 data Command
   = List
