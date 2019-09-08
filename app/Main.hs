@@ -81,7 +81,7 @@ runList = do
     Left err         -> putStrLn $ (T.pack . show) err
     Right submodules -> do
       -- putStrLn "\nsubmodules in the current repository :"
-      putStrLn . intercalate "\t" $ T.pack . show <$> submodules
+      putStrLn . intercalate "\n" $ T.pack . show <$> submodules
 
 run :: Command -> IO ()
 run command = case command of
