@@ -18,10 +18,10 @@ git-sub list - list submodules for the current repository
 ## roadmap
 
 - [x] - implement list functionality
-- [] - implement add functionality
-- [] - implement remove functionality
-- [] - implement move functionality
-- [] - make search for .gitmodules and .git/config files possible from subdirectories
+- [ ] - implement add functionality
+- [ ] - implement remove functionality
+- [ ] - implement move functionality
+- [ ] - make search for .gitmodules and .git/config files possible from subdirectories
 
 
 
