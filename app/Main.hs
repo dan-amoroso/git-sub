@@ -43,7 +43,7 @@ showHelpOnErrorExecParser = customExecParser (prefs showHelpOnError)
 
 parseCommand :: Parser Command
 parseCommand = subparser $ mempty
-  <> command "list"
+  <> command "ls"
        (info
          (helper <*> parseListCommand)
          (fullDesc <> progDesc "list submodules"))
