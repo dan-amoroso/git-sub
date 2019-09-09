@@ -29,6 +29,8 @@ dependencies:
 - system-filepath
 - bytestring
 - process
+- filepath
+- utf8-string
 
 library:
   source-dirs: src
