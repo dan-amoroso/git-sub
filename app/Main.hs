@@ -43,22 +43,22 @@ showHelpOnErrorExecParser = customExecParser (prefs showHelpOnError)
 
 parseCommand :: Parser Command
 parseCommand = subparser $ mempty
-  <> (command "list"
+  <> command "list"
        (info
          (helper <*> parseListCommand)
-         (fullDesc <> progDesc "list submodules")))
-  <> (command "add"
+         (fullDesc <> progDesc "list submodules"))
+  <> command "add"
        (info
          (helper <*> parseAddCommand)
-         (fullDesc <> progDesc "add a submodule")))
-  <> (command "rm"
+         (fullDesc <> progDesc "add a submodule"))
+  <> command "rm"
        (info
          (helper <*> parseRemoveCommand)
-         (fullDesc <> progDesc "remove a submodule")))
-  <> (command "mv"
+         (fullDesc <> progDesc "remove a submodule"))
+  <> command "mv"
        (info
          (helper <*> parseMoveCommand)
-         (fullDesc <> progDesc "move a submodule")))
+         (fullDesc <> progDesc "move a submodule"))
 
 run :: Command -> IO ()
 run command = case command of
@@ -73,18 +73,16 @@ runList = do
   let submodules = parseSubmodules submodulesStr
   case submodules of
     Left err         -> putStrLn ".gitmodules not found."
-    Right submodules -> do
-      putStrLn . intercalate "\n" $ T.pack . show <$> submodules
+    Right submodules -> putStrLn . intercalate "\n" $ T.pack . show <$> submodules
 
 runAdd :: String -> FilePath -> IO ()
 runAdd url path =
-  case (valid path) of
-    True -> do
-      let gitCmd = shell $ "git submodule add " ++ url ++ " " ++ (encodeString path)
-      result <- readCreateProcess gitCmd ""
-      putStrLn $ T.pack $ result
-    False ->
-      putStrLn "invalid path argument"
+  if valid path
+    then
+      do let gitCmd = shell $ "git submodule add " ++ url ++ " " ++ encodeString path
+         result <- readCreateProcess gitCmd ""
+         putStrLn $ T.pack result
+    else putStrLn "invalid path argument"
 
 gitRmCached = "git rm --cached "
 gitRmGitmodulesEntry = "git config -f .gitmodules --remove-section submodule."
@@ -101,20 +99,20 @@ runRemove path =
       removeCached = shell . T.unpack $ "git rm --cached " <> cleanPath
       removeGitmodulesEntry = shell . T.unpack $ gitRmGitmodulesEntry <> cleanPath
       removeGitConfigEntry = shell . T.unpack$ gitRmGitConfigEntry <> cleanPath
-  in do
-  readCreateProcess removeCached ""
-  readCreateProcess removeGitmodulesEntry ""
-  readCreateProcess removeGitConfigEntry ""
-  readCreateProcess (shell "git add -u") ""
-  putStrLn $ "Submodules entries for " <> (T.pack $ encodeString path) <> " were deleted."
-  putStrLn $ "The changes have been staged for you."
-  putStrLn $ "Please commit the changes to complete the submodule removal."
+   in do
+     readCreateProcess removeCached ""
+     readCreateProcess removeGitmodulesEntry ""
+     readCreateProcess removeGitConfigEntry ""
+     readCreateProcess (shell "git add -u") ""
+     putStrLn $ "Submodules entries for " <> T.pack (encodeString path) <> " were deleted."
+     putStrLn "The changes have been staged for you."
+     putStrLn "Please commit the changes to complete the submodule removal."
 
 runMove :: FilePath -> FilePath -> IO ()
 runMove from to = putStrLn "not implemented yet"
 
 parseListCommand :: Parser Command
-parseListCommand = pure(List)
+parseListCommand = pure List
 
 parseAddCommand :: Parser Command
 parseAddCommand = Add <$> urlParser <*> pathParser
@@ -131,14 +129,11 @@ urlParser = argument str (metavar "URL" <> help "url of the submodule repository
 pathParser :: Parser FilePath
 pathParser =
   argument (str >>= readPath)
-    (metavar "PATH" <> help ("path to the submodule"))
+    (metavar "PATH" <> help "path to the submodule")
 
 readPath :: String -> ReadM FilePath
 readPath s = do
   let path = Path.fromText (T.pack s)
   if Path.valid path
     then return path
-    else readerError ("invalid path: " ++ (show path))
-
-
-
+    else readerError ("invalid path: " ++ show path)

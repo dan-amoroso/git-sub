@@ -44,10 +44,10 @@ someFunc :: IO ()
 someFunc = do
   subModString <- readFile ".gitmodules"
   let subModule = parse parseSubmodule ".gitmodules" subModString
-  putStrLn $ show subModule
+  print subModule
   let subModules = parse (many parseSubmodule) ".gitmodules" subModString
-  putStrLn $ show subModules
+  print subModules
   putStrLn subModString
   case subModules of
     Left _           -> putStrLn "error!"
-    Right submodules -> putStrLn $ concat $ fmap writeSubmodule submodules
+    Right submodules -> putStrLn $ concatMap writeSubmodule submodules
