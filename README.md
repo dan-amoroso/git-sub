@@ -8,9 +8,9 @@ offering the following endpoints
 
 
 ```
-git-sub add URL [PATH] - add a submodule
-git-sub rm [PATH] - remove a submodule
-git-sub mv [fromPATH] [toPATH] - move a submodule to a new directory
+git-sub add URL PATH - add a submodule
+git-sub rm PATH - remove a submodule
+git-sub mv FROM-PATH TO-PATH - move a submodule to a new directory
 git-sub list - list submodules for the current repository
 
 ```
