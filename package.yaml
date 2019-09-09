@@ -28,6 +28,7 @@ dependencies:
 - optparse-applicative
 - system-filepath
 - bytestring
+- process
 
 library:
   source-dirs: src

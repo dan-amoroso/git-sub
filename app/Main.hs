@@ -12,13 +12,11 @@ import           Data.Text.Encoding        as T.Encoding
 import           Data.Text.IO              (putStrLn)
 import           Data.Traversable
 import           Lib                       (parseSubmodules)
+import           System.Process            (readCreateProcess, shell)
 --import qualified System.Console.ANSI as ANSI
 import           Filesystem.Path.CurrentOS as Path
 import           Options.Applicative
 import           Prelude                   hiding (FilePath, putStrLn)
-
-smDescription = "utility to manage submodules in a git repository"
-smHeader = "git-sub: git submodules made easy"
 
 data Command
   = List
@@ -26,6 +24,20 @@ data Command
   | Remove { path :: FilePath }
   | Move { from :: FilePath, to :: FilePath }
   deriving (Show, Eq)
+
+main :: IO ()
+main = do
+  command <-
+    showHelpOnErrorExecParser
+      (info
+        (helper <*> parseCommand)
+        (fullDesc <> progDesc smDescription <> header smHeader))
+  run command
+
+smDescription = "utility to manage submodules in a git repository"
+smHeader = "git-sub: git submodules made easy"
+
+showHelpOnErrorExecParser = customExecParser (prefs showHelpOnError)
 
 parseCommand :: Parser Command
 parseCommand = subparser $ mempty
@@ -46,6 +58,38 @@ parseCommand = subparser $ mempty
          (helper <*> parseMoveCommand)
          (fullDesc <> progDesc "move a submodule")))
 
+run :: Command -> IO ()
+run command = case command of
+  List         -> runList
+  Add url path -> runAdd url path
+  Remove path  -> runRemove path
+  Move from to -> runMove from to
+
+runList :: IO ()
+runList = do
+  submodulesStr <- readFile ".gitmodules"
+  let submodules = parseSubmodules submodulesStr
+  case submodules of
+    Left err         -> putStrLn $ (T.pack . show) err
+    Right submodules -> do
+      putStrLn . intercalate "\n" $ T.pack . show <$> submodules
+
+runAdd :: String -> FilePath -> IO ()
+runAdd url path =
+  case (valid path) of
+    True -> do
+      let gitCmd = shell $ "git submodule add " ++ url ++ " " ++ (encodeString path)
+      result <- readCreateProcess gitCmd ""
+      putStrLn $ T.pack $ result
+    False ->
+      putStrLn "invalid path argument"
+
+runRemove :: FilePath -> IO ()
+runRemove path = undefined
+
+runMove :: FilePath -> FilePath -> IO ()
+runMove from to = undefined
+
 parseListCommand :: Parser Command
 parseListCommand = pure(List)
 
@@ -64,7 +108,7 @@ urlParser = argument str (metavar "URL" <> help "url of the submodule repository
 pathParser :: Parser FilePath
 pathParser =
   argument (str >>= readPath)
-    (value "./" <> metavar "PATH" <> help ("path to the submodule"))
+    (metavar "PATH" <> help ("path to the submodule"))
 
 readPath :: String -> ReadM FilePath
 readPath s = do
@@ -73,29 +117,5 @@ readPath s = do
     then return path
     else readerError ("invalid path: " ++ (show path))
 
-runList :: IO ()
-runList = do
-  submodulesStr <- readFile ".gitmodules"
-  let submodules = parseSubmodules submodulesStr
-  case submodules of
-    Left err         -> putStrLn $ (T.pack . show) err
-    Right submodules -> do
-      -- putStrLn "\nsubmodules in the current repository :"
-      putStrLn . intercalate "\n" $ T.pack . show <$> submodules
-
-run :: Command -> IO ()
-run command = case command of
-  List         -> runList
-  Add url path -> undefined
-  Remove path  -> undefined
-  Move from to -> undefined
 
 
-showHelpOnErrorExecParser = customExecParser (prefs showHelpOnError)
-
-main :: IO ()
-main = do
-  command <- showHelpOnErrorExecParser (info
-    (helper <*> parseCommand)
-    (fullDesc <> progDesc smDescription <> header smHeader))
-  run command
