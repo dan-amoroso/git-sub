@@ -1,10 +1,8 @@
 # git-sub
 
-git-sub aims to provide a simple way to deal with submodules in a git repository
-eliminating the need for manual operations 
+git-sub tries to minimize manual operations needed to deal with submodules
 
-the cli api tries to stay consistent with git and other cli tools by 
-offering the following endpoints
+the CLI api offers the following endpoints:
 
 
 ```
