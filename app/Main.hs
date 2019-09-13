@@ -89,27 +89,33 @@ gitRmGitmodulesEntry = "git config -f .gitmodules --remove-section submodule."
 gitRmGitConfigEntry = "git config -f .git/config --remove-section submodule."
 
 runRemove :: FilePath -> IO ()
-runRemove path =
-  let textPath = case toText path of
-                   Right text -> text
-                   Left err   -> err
-      cleanPath = if T.last textPath == '/'
-                    then T.dropEnd 1 textPath
-                    else textPath
-      removeCached = shell . T.unpack $ "git rm --cached " <> cleanPath
-      removeGitmodulesEntry = shell . T.unpack $ gitRmGitmodulesEntry <> cleanPath
-      removeGitConfigEntry = shell . T.unpack$ gitRmGitConfigEntry <> cleanPath
-   in do
-     readCreateProcess removeCached ""
-     readCreateProcess removeGitmodulesEntry ""
-     readCreateProcess removeGitConfigEntry ""
-     readCreateProcess (shell "git add -u") ""
-     putStrLn $ "Submodules entries for " <> T.pack (encodeString path) <> " were deleted."
-     putStrLn "The changes have been staged for you."
-     putStrLn "Please commit the changes to complete the submodule removal."
+runRemove path = do
+  readCreateProcess removeCached ""
+  readCreateProcess removeGitmodulesEntry ""
+  readCreateProcess removeGitConfigEntry ""
+  readCreateProcess (shell "git add -u") ""
+  putStrLn $ "Submodules entries for " <> T.pack (encodeString path) <> " were deleted."
+  putStrLn "The changes have been staged for you."
+  putStrLn "Please commit the changes to complete the submodule removal."
+  where removeCached = shell . T.unpack $ "git rm --cached " <> cleanTxt path
+        removeGitmodulesEntry = shell . T.unpack $ gitRmGitmodulesEntry <> cleanTxt path
+        removeGitConfigEntry = shell . T.unpack$ gitRmGitConfigEntry <> cleanTxt path
+
+gitMove = "git mv "
 
 runMove :: FilePath -> FilePath -> IO ()
-runMove from to = putStrLn "not implemented yet"
+runMove from to = do
+  readCreateProcess (shell . T.unpack $ gitMove <> cleanTxt from <> " " <> cleanTxt to) ""
+  readCreateProcess (shell "git add -u") ""
+  putStrLn $ "Submodule has been moved from " <> cleanTxt from <> " to " <> cleanTxt to
+  putStrLn "The changes have been staged for you."
+  putStrLn "Please commit the changes to complete the submodule move."
+
+cleanTxt :: FilePath -> Text
+cleanTxt = clean . toText
+  where clean txtPath = case txtPath of
+          Right text -> if T.last text == '/' then T.dropEnd 1 text else text
+          Left err   -> err
 
 parseListCommand :: Parser Command
 parseListCommand = pure List
