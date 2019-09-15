@@ -2,23 +2,16 @@
 
 module Main where
 
-import           Control.Monad
-import           Data.ByteString.Lazy      as B hiding (intercalate, putStrLn,
-                                                 readFile)
 import           Data.List                 hiding (intercalate)
-import           Data.Maybe
 import           Data.Monoid
 import           Data.String               (IsString)
 import           Data.Text                 as T hiding (intercalate, unlines)
-import           Data.Text.Encoding        as T.Encoding
-import           Data.Traversable
 import           Filesystem.Path.CurrentOS as Path (FilePath, encodeString,
                                                     toText, valid)
 import           GitSub.CmdParsers
 import           GitSub.Submodule          (parseSubmodules)
 import           Options.Applicative
 import           Prelude                   hiding (FilePath)
-import           System.FilePath.Posix     (dropTrailingPathSeparator)
 import           System.Process            (readCreateProcess, shell)
 
 main :: IO ()
