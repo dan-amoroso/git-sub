@@ -1,4 +1,4 @@
-module Lib
+module GitSub.Submodule
     ( Submodule
     , parseSubmodule
     , parseSubmodules
