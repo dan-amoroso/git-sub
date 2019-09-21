@@ -2,6 +2,7 @@ module GitSub.Submodule
     ( Submodule
     , parseSubmodule
     , parseSubmodules
+    , showPath
     ) where
 
 import           Control.Applicative hiding (many)
@@ -14,10 +15,10 @@ type Name = String
 type Path = String
 type Url = String
 
-data Submodule = Submodule Name Path Url deriving (Eq)
+data Submodule = Submodule Name Path Url deriving (Eq, Show)
 
-instance Show Submodule where
-  show (Submodule _ path _) = path
+showPath :: Submodule -> String
+showPath (Submodule _ path _) = path
 
 parseSubmodule :: Parsec String () Submodule
 parseSubmodule = do
@@ -39,15 +40,3 @@ parseSubmodules = parse (many parseSubmodule) ".gitmodules"
 writeSubmodule :: Submodule -> String
 writeSubmodule (Submodule name path url) =
   format "[submodule \"{0}\"]\n\tpath = {1}\n\turl = {2}\n" [name, path, url]
-
-someFunc :: IO ()
-someFunc = do
-  subModString <- readFile ".gitmodules"
-  let subModule = parse parseSubmodule ".gitmodules" subModString
-  print subModule
-  let subModules = parse (many parseSubmodule) ".gitmodules" subModString
-  print subModules
-  putStrLn subModString
-  case subModules of
-    Left _           -> putStrLn "error!"
-    Right submodules -> putStrLn $ concatMap writeSubmodule submodules

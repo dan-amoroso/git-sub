@@ -9,7 +9,7 @@ import           Filesystem.Path.CurrentOS as Path (FilePath, encodeString,
                                                     toText, valid)
 
 import           GitSub.CmdParsers
-import           GitSub.Submodule          (parseSubmodules)
+import           GitSub.Submodule          (parseSubmodules, showPath)
 import           Options.Applicative
 import           Prelude                   hiding (FilePath)
 import           System.Process            (readCreateProcess, shell)
@@ -27,7 +27,7 @@ runList = do
   let submodules = parseSubmodules submodulesStr
   case submodules of
     Left _     -> printText ".gitmodules not found."
-    Right subs -> putStrLn . unlines $ show <$> subs
+    Right subs -> putStrLn . unlines $ showPath <$> subs
 
 runAdd :: String -> FilePath -> IO ()
 runAdd url path =
