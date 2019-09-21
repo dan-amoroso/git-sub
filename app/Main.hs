@@ -1,10 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Main where
+module Main (main) where
 
 import           Data.List                 hiding (intercalate)
 import           Data.Monoid
-import           Data.String               (IsString)
 import           Data.Text                 as T hiding (intercalate, unlines)
 import           Filesystem.Path.CurrentOS as Path (FilePath, encodeString,
                                                     toText, valid)
@@ -16,18 +15,21 @@ import           System.Process            (readCreateProcess, shell)
 
 main :: IO ()
 main = do
-  command <-
+  gitSubCommand <-
     showHelpOnErrorExecParser
       (info
         (helper <*> parseCommand)
         (fullDesc <> progDesc smDescription <> header smHeader))
-  run command
+  run gitSubCommand
 
+smDescription :: String
 smDescription = "utility to manage submodules in a git repository"
+
+smHeader :: String
 smHeader = "git-sub: git submodules made easy"
 
 run :: Command -> IO ()
-run command = case command of
+run gitSubCommand = case gitSubCommand of
   List         -> runList
   Add url path -> runAdd url path
   Remove path  -> runRemove path
@@ -38,8 +40,8 @@ runList = do
   submodulesStr <- readFile ".gitmodules"
   let submodules = parseSubmodules submodulesStr
   case submodules of
-    Left err         -> print ".gitmodules not found."
-    Right submodules -> putStrLn . unlines $ show <$> submodules
+    Left _     -> printText ".gitmodules not found."
+    Right subs -> putStrLn . unlines $ show <$> subs
 
 runAdd :: String -> FilePath -> IO ()
 runAdd url path =
@@ -47,11 +49,18 @@ runAdd url path =
     then do
       result <- runShell $ "git submodule add " ++ url ++ " " ++ encodeString path
       print result
-    else print "invalid path argument"
+    else printText "invalid path argument"
 
+gitRmCached :: Text
 gitRmCached = "git rm --cached "
+
+gitRmGitmodulesEntry :: Text
 gitRmGitmodulesEntry = "git config -f .gitmodules --remove-section submodule."
+
+gitRmGitConfigEntry :: Text
 gitRmGitConfigEntry = "git config -f .git/config --remove-section submodule."
+
+gitStage :: Text
 gitStage = "git add -u"
 
 runRemove :: FilePath -> IO ()
@@ -60,10 +69,10 @@ runRemove path = do
   runShell removeGitmodulesEntry
   runShell removeGitConfigEntry
   runShell gitStage
-  print $ "Submodules entries for " <> path' <> " were deleted."
-  print "The changes have been staged for you."
-  print "Please commit the changes to complete the submodule removal."
-  where removeCached = "git rm --cached " <> path'
+  printText $ "Submodules entries for " <> path' <> " were deleted."
+  printText "The changes have been staged for you."
+  printText "Please commit the changes to complete the submodule removal."
+  where removeCached = gitRmCached <> path'
         removeGitmodulesEntry = gitRmGitmodulesEntry <> path'
         removeGitConfigEntry = gitRmGitConfigEntry <> path'
         path' = cleanTxt path
@@ -72,9 +81,9 @@ runMove :: FilePath -> FilePath -> IO ()
 runMove from to = do
   runShell $ gitMove <> from' <> " " <> to'
   runShell gitStage
-  print $ "Submodule moved from " <> from' <> " to " <> to'
-  print "The changes have been staged for you."
-  print "Please commit the changes to complete the submodule move."
+  printText $ "Submodule moved from " <> from' <> " to " <> to'
+  printText "The changes have been staged for you."
+  printText "Please commit the changes to complete the submodule move."
   where gitMove = "git mv "
         from' = cleanTxt from
         to' = cleanTxt to
@@ -85,6 +94,8 @@ cleanTxt = removeTrailingSlash . toText
           Right text -> if T.last text == '/' then T.dropEnd 1 text else text
           Left err   -> err
 
-runShell :: (Show a, IsString a) => a -> IO String
-runShell str = readCreateProcess (shell $ show str) ""
+runShell :: (Show a) => a -> IO String
+runShell strCommand = readCreateProcess (shell $ show strCommand) ""
 
+printText :: Text -> IO ()
+printText = print

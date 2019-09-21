@@ -40,7 +40,18 @@ executables:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
-    - -fwarn-unused-imports
+    - -Wall
+    - -Wincomplete-uni-patterns
+    - -Wincomplete-record-updates
+    - -Wcompat
+    - -Widentities
+    - -Wredundant-constraints
+    - -Wmissing-export-lists
+    - -Wpartial-fields
+    - -fhide-source-paths
+    - -freverse-errors
+    - -XApplicativeDo
+    - -XRecordWildCards
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
