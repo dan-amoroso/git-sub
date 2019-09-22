@@ -6,7 +6,6 @@ module GitSub.Submodule
     ) where
 
 import           Control.Applicative ()
-import           Text.Format
 import           Text.Parsec         (ParseError, Parsec, between, many, noneOf,
                                       parse, spaces, string)
 
