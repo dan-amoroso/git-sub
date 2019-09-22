@@ -11,14 +11,14 @@ import           Text.Format
 import           Text.Parsec         (Parsec, between, many, noneOf, parse,
                                       spaces, string, (<?>))
 
-type Name = String
-type Path = String
-type Url = String
+newtype Name = Name String deriving (Eq, Show)
+newtype Path = Path String deriving (Eq, Show)
+newtype Url = Url String deriving (Eq, Show)
 
 data Submodule = Submodule Name Path Url deriving (Eq, Show)
 
 showPath :: Submodule -> String
-showPath (Submodule _ path _) = path
+showPath (Submodule _ (Path path) _) = path
 
 parseSubmodule :: Parsec String () Submodule
 parseSubmodule = do
@@ -26,7 +26,7 @@ parseSubmodule = do
   spaces
   path <- between pathOpen spaces text
   url <- between urlOpen spaces text
-  return $ Submodule name path url
+  return $ Submodule (Name name)(Path path) (Url url)
   where
     subOpen = string "[submodule \""
     subClose = string "\"]"
@@ -38,5 +38,5 @@ parseSubmodule = do
 parseSubmodules = parse (many parseSubmodule) ".gitmodules"
 
 writeSubmodule :: Submodule -> String
-writeSubmodule (Submodule name path url) =
+writeSubmodule (Submodule (Name name) (Path path) (Url url)) =
   format "[submodule \"{0}\"]\n\tpath = {1}\n\turl = {2}\n" [name, path, url]
