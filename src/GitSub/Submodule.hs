@@ -5,11 +5,10 @@ module GitSub.Submodule
     , showPath
     ) where
 
-import           Control.Applicative hiding (many)
-import           Data.List           (intercalate)
+import           Control.Applicative ()
 import           Text.Format
-import           Text.Parsec         (Parsec, between, many, noneOf, parse,
-                                      spaces, string, (<?>))
+import           Text.Parsec         (ParseError, Parsec, between, many, noneOf,
+                                      parse, spaces, string)
 
 newtype Name = Name String deriving (Eq, Show)
 newtype Path = Path String deriving (Eq, Show)
@@ -35,8 +34,5 @@ parseSubmodule = do
     urlOpen = string "url = "
     text = many $ noneOf " \n\t"
 
+parseSubmodules :: String -> Either ParseError [Submodule]
 parseSubmodules = parse (many parseSubmodule) ".gitmodules"
-
-writeSubmodule :: Submodule -> String
-writeSubmodule (Submodule (Name name) (Path path) (Url url)) =
-  format "[submodule \"{0}\"]\n\tpath = {1}\n\turl = {2}\n" [name, path, url]

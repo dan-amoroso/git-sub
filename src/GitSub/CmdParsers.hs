@@ -6,8 +6,7 @@ module GitSub.CmdParsers
    ) where
 
 import           Data.Text                 (pack)
-import           Filesystem.Path.CurrentOS as Path (FilePath, fromText, toText,
-                                                    valid)
+import           Filesystem.Path.CurrentOS as Path (FilePath, fromText, valid)
 import           Options.Applicative
 import           Prelude                   hiding (FilePath)
 
