@@ -16,10 +16,10 @@ import           System.Process            (readCreateProcess, shell)
 
 run :: Command -> IO ()
 run gitSubCommand = case gitSubCommand of
-  List         -> runList
-  Add url path -> runAdd url path
-  Remove path  -> runRemove path
-  Move from to -> runMove from to
+  List                        -> runList
+  Add (SubmoduleUrl url) path -> runAdd url path
+  Remove path                 -> runRemove path
+  Move from to                -> runMove from to
 
 runList :: IO ()
 runList = do

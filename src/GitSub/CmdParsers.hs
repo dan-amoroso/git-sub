@@ -1,4 +1,9 @@
-module GitSub.CmdParsers where
+module GitSub.CmdParsers
+   ( Command(..)
+   , SubmoduleUrl(..)
+   , showHelpOnErrorExecParser
+   , parseCommand
+   ) where
 
 import           Data.Text                 (pack)
 import           Filesystem.Path.CurrentOS as Path (FilePath, fromText, toText,
@@ -6,13 +11,16 @@ import           Filesystem.Path.CurrentOS as Path (FilePath, fromText, toText,
 import           Options.Applicative
 import           Prelude                   hiding (FilePath)
 
+newtype SubmoduleUrl = SubmoduleUrl String deriving (Eq, Show)
+
 data Command
   = List
-  | Add { url :: String, path :: FilePath }
-  | Remove { path :: FilePath }
-  | Move { from :: FilePath, to :: FilePath }
+  | Add SubmoduleUrl FilePath
+  | Remove FilePath
+  | Move FilePath FilePath
   deriving (Show, Eq)
 
+showHelpOnErrorExecParser :: ParserInfo Command -> IO Command
 showHelpOnErrorExecParser = customExecParser (prefs showHelpOnError)
 
 parseCommand :: Parser Command
@@ -46,13 +54,20 @@ parseRemoveCommand = Remove <$> pathParser
 parseMoveCommand :: Parser Command
 parseMoveCommand = Move <$> pathParser <*> pathParser
 
-urlParser :: Parser String
-urlParser = argument str (metavar "URL" <> help "url of the submodule repository")
+urlParser :: Parser SubmoduleUrl
+urlParser =
+  argument
+    (str >>= readSubmoduleUrl)
+    (metavar "URL" <> help "url of the submodule repository")
 
 pathParser :: Parser FilePath
 pathParser =
-  argument (str >>= readPath)
+  argument
+    (str >>= readPath)
     (metavar "PATH" <> help "file-path to the submodule")
+
+readSubmoduleUrl :: String -> ReadM SubmoduleUrl
+readSubmoduleUrl s = return (SubmoduleUrl s)
 
 readPath :: String -> ReadM FilePath
 readPath s = do
