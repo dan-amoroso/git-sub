@@ -4,4 +4,4 @@ Git-sub is an experimental project that I am using primarily to learn haskell de
 
 I would appreciate both contributions and feedback in any form. 
 
-The only right I reserve over pull-request process is to ask plenty of question for learning purposes.
+The only right I reserve over pull-requests is to ask plenty of questions for learning purposes.
