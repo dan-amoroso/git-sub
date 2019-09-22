@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0c0234693fc46530721cb6ca688c818eeb92dcc0d9bf4d7ccd6e08c71328930f
+-- hash: fc56054a7d7ae19d8cff15e4da413be04b2c73b016ba88d944054f034d60bc7d
 
 name:           git-sub
 version:        0.1.0.0
@@ -27,6 +27,7 @@ source-repository head
 
 library
   exposed-modules:
+      GitSub
       GitSub.CmdParsers
       GitSub.Submodule
   other-modules:
@@ -53,7 +54,7 @@ executable git-sub
       Paths_git_sub
   hs-source-dirs:
       app
-  ghc-options: -fwarn-unused-imports -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -Wincomplete-uni-patterns -Wincomplete-record-updates -Wcompat -Widentities -Wredundant-constraints -Wmissing-export-lists -Wpartial-fields -fhide-source-paths -freverse-errors -XApplicativeDo -XRecordWildCards -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
     , bytestring
