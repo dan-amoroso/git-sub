@@ -1,4 +1,4 @@
-# git-sub [![Build Status](https://travis-ci.com/Dansvidania/git-sub.svg?branch=master)](https://travis-ci.com/Dansvidania/git-sub)
+# git-sub [![Build Status](https://travis-ci.com/Dansvidania/git-sub.svg?branch=master)](https://travis-ci.com/Dansvidania/git-sub) [![Open Source Helpers](https://www.codetriage.com/dansvidania/git-sub/badges/users.svg)](https://www.codetriage.com/dansvidania/git-sub)
 
 git-sub tries to minimize manual operations needed to deal with submodules
 
