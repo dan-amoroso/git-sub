@@ -19,6 +19,7 @@ git-sub ls - list submodules for the current repository
 - [x] - implement add functionality
 - [x] - implement remove functionality
 - [x] - implement move functionality
+- [ ] - implement update functionality (track submodule branch)
 - [ ] - make search for .gitmodules and .git/config files possible from subdirectories
 
 
